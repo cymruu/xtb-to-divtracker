@@ -1,6 +1,7 @@
 import { parseCostPerShare } from "./parsers/parseCostPerShare";
 import { parseDate } from "./parsers/parseDate";
 import { parseQuantity } from "./parsers/parseQuantity";
+import { parseTicker } from "./parsers/parseTicker";
 
 const textEncoder = new TextEncoder();
 
@@ -102,7 +103,7 @@ const parseData = (currency: string) =>
   new TransformStream({
     transform(chunk, controller) {
       controller.enqueue({
-        Ticker: chunk["Symbol"],
+        Ticker: parseTicker(chunk["Symbol"], currency),
         Quantity: parseQuantity(chunk["Comment"]),
         CostPerShare: parseCostPerShare(chunk["Comment"]),
         Currency: currency,
