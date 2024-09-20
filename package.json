@@ -1,0 +1,19 @@
+{
+  "name": "xtb-to-divtracker",
+  "version": "0.0.1",
+  "main": "dist/main.js",
+  "packageManager": "pnpm@9.10.0",
+  "scripts": {
+    "build": "esbuild src/main.ts --bundle --outfile=./dist/main.js",
+    "test": "node --import tsx --test $(find . -name \"*.test.ts\")"
+  },
+  "files": [
+    "./dist"
+  ],
+  "devDependencies": {
+    "esbuild": "0.23.1",
+    "tsx": "4.19.0",
+    "typescript": "5.5.4"
+  },
+  "dependencies": {}
+}

@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>XTB history to DivTracker</title>
+    <style>
+      #drop-area {
+        border: 2px dashed #ccc;
+        width: 300px;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 20px;
+        padding: 10px;
+      }
+      #file-content {
+        margin-top: 20px;
+        white-space: pre-wrap;
+        background-color: #f4f4f4;
+        padding: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>
+      Drop the CSV file exported from XTB to generate DivTracker import sheet
+    </h2>
+    <h3>1. Please select a currency of the the imported wallet</h3>
+    <select name="currency" id="currency">
+      <option value="PLN">PLN</option>
+      <option value="EUR">EUR</option>
+      <option value="USD">USD</option>
+    </select>
+
+    <h3>2. Drop a CSV file exported from XTB</h3>
+    <div id="drop-area">Drop your CSV transaction history file here</div>
+
+    <div id="file-content"></div>
+    <script src="dist/main.js"></script>
+  </body>
+</html>
