@@ -1,0 +1,41 @@
+name: ci
+
+on: push
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: ["22.x"]
+
+    steps:
+      - uses: actions/checkout@v4
+      # pnpm/action-setup@v2 automatically installs version defined in `package.json`
+      - uses: pnpm/action-setup@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+      - run: pnpm install
+      - run: pnpm test
+      - run: pnpm run build
+      - name: Upload build-artifacts
+        if: github.ref == 'refs/heads/master'
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: |
+            dist/
+            index.html
+
+  trigger-deploy:
+    needs: build
+    uses: cymruu/xtb-to-divtracker/.github/workflows/deploy.yml@master
