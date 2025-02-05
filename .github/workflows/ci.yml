@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      # pnpm/action-setup@v2 automatically installs version defined in `package.json`
+      # pnpm/action-setup@v3 automatically installs version defined in `package.json`
       - uses: pnpm/action-setup@v3
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -27,6 +27,7 @@ jobs:
       - run: pnpm install
       - run: pnpm test
       - run: pnpm run build
+      - run: cp node_modules/excelize-wasm/excelize.wasm.gz ./dist/
       - name: Upload build-artifacts
         if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4

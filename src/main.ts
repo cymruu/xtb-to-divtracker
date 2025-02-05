@@ -1,151 +1,43 @@
-import { parseCostPerShare } from "./parsers/parseCostPerShare";
-import { parseDate } from "./parsers/parseDate";
-import { parseQuantity } from "./parsers/parseQuantity";
-import { parseTicker } from "./parsers/parseTicker";
+import { init } from "excelize-wasm";
+import { parseCashOperationRows } from "./parsers/parseCashOperationRows";
+import { processRowStream } from "./stream";
 
-const textEncoder = new TextEncoder();
+const excelizePromise = init("./dist/excelize.wasm.gz");
 
-const INPUT_FILE_HEADER = ["ID", "Type", "Time", "Symbol", "Comment", "Amount"];
-const OUTPUT_FILE_HEADER = [
-  "Ticker",
-  "Quantity",
-  "Cost Per Share",
-  "Currency",
-  "Date",
-  "Commission",
-  "Commission Currency",
-  "DRIP Confirmed",
-];
+function arrayToReadableStream(array: string[][]): ReadableStream<string[]> {
+  let index = 0;
 
-const createCSVLine = (values: string[]) => {
-  return values.join(";") + "\n";
-};
+  return new ReadableStream({
+    pull(controller) {
+      if (index < array.length) {
+        controller.enqueue(array[index]);
+        index++;
+      } else {
+        controller.close();
+      }
+    },
+  });
+}
 
 const processFile = async (file: File, currency: string) => {
-  const chunks: string[] = [];
+  const arrayBuffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(arrayBuffer);
 
-  const outputStream = new WritableStream({
-    write(chunk) {
-      chunks.push(chunk);
-    },
+  excelizePromise.then(async (excelize) => {
+    const xlsxFile = excelize.OpenReader(bytes);
+
+    const result = xlsxFile.GetRows("CASH OPERATION HISTORY");
+    if (result.error) {
+      throw result.error;
+    }
+
+    const parsedLines = parseCashOperationRows(result.result);
+    const stream = arrayToReadableStream(parsedLines.result);
+    const resultFile = await processRowStream(stream, currency);
+
+    const link = downloadFile(resultFile, resultFile.name);
+    link.click();
   });
-
-  const writer = outputStream.getWriter();
-  const headerBytes = textEncoder.encode(createCSVLine(OUTPUT_FILE_HEADER));
-
-  await writer.write(headerBytes);
-  writer.releaseLock();
-
-  await file
-    .stream()
-    .pipeThrough(new TextDecoderStream())
-    .pipeThrough(unwrapCSVLinesTransform())
-    .pipeThrough(parseCSVRow())
-    .pipeThrough(mapToObject())
-    .pipeThrough(filterData())
-    .pipeThrough(parseData(currency))
-    .pipeThrough(serializeToCSV())
-    .pipeThrough(serializeToBytes())
-    .pipeTo(outputStream);
-
-  const timeStamp = new Date().toISOString();
-  const fileName = `wallet_${currency}_${timeStamp}.csv`;
-
-  const resultFile = new File(chunks, fileName);
-
-  const link = downloadFile(resultFile, resultFile.name);
-  link.click();
-};
-
-const unwrapCSVLinesTransform = () =>
-  new TransformStream({
-    transform(chunk, controller) {
-      const lines = chunk.split("\r\n");
-      for (const line of lines) {
-        controller.enqueue(line);
-      }
-    },
-  });
-
-const parseCSVRow = () =>
-  new TransformStream({
-    transform(chunk, controller) {
-      const values = chunk.split(";");
-      controller.enqueue(values);
-    },
-  });
-
-const mapToObject = () =>
-  new TransformStream({
-    transform(chunk, controller) {
-      controller.enqueue(
-        Object.fromEntries(
-          INPUT_FILE_HEADER!.map((key, index) => [key, chunk[index]]),
-        ),
-      );
-    },
-  });
-
-const filterData = () =>
-  new TransformStream({
-    transform(chunk, controller) {
-      const lineType = chunk["Type"];
-      if (
-        lineType === "Stocks/ETF purchase" ||
-        lineType === "Stocks/ETF sale"
-      ) {
-        controller.enqueue(chunk);
-      }
-    },
-  });
-
-const parseData = (currency: string) =>
-  new TransformStream({
-    transform(chunk, controller) {
-      controller.enqueue({
-        Ticker: parseTicker(chunk["Symbol"], currency),
-        Quantity: parseQuantity(chunk["Comment"]),
-        CostPerShare: parseCostPerShare(chunk["Comment"]),
-        Currency: currency,
-        Date: parseDate(chunk["Time"]),
-        Commision: "",
-        CommissionCurrency: "",
-        DRIPConfirmed: "",
-      });
-    },
-  });
-
-const serializeToCSV = () =>
-  new TransformStream({
-    transform(chunk, controller) {
-      controller.enqueue(
-        createCSVLine([
-          chunk.Ticker,
-          chunk.Quantity,
-          chunk.CostPerShare,
-          chunk.Currency,
-          chunk.Date,
-          chunk.Commission,
-          chunk.CommissionCurrency,
-          chunk.DRIPConfirmed,
-        ]),
-      );
-    },
-  });
-
-const serializeToBytes = () =>
-  new TransformStream({
-    transform(chunk, controller) {
-      controller.enqueue(textEncoder.encode(chunk));
-    },
-  });
-
-const downloadFile = (file: File, filename: string): HTMLAnchorElement => {
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(file);
-  link.download = filename;
-
-  return link;
 };
 
 (() => {
@@ -169,10 +61,22 @@ const downloadFile = (file: File, filename: string): HTMLAnchorElement => {
 
     const file = event.dataTransfer?.files[0];
 
-    if (file && file.type === "text/csv") {
+    if (
+      file &&
+      file.type ===
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    ) {
       processFile(file, currency);
     } else {
-      fileContentDiv.textContent = "Please upload a valid CSV file.";
+      fileContentDiv.textContent = "Please select a valid XLSX file.";
     }
   });
 })();
+
+const downloadFile = (file: File, filename: string): HTMLAnchorElement => {
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(file);
+  link.download = filename;
+
+  return link;
+};
