@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>XTB history to DivTracker</title>
     <style>
+      html,
+      body {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        margin-left: 5px;
+      }
+      #content {
+        flex: 1;
+      }
       #drop-area {
         border: 2px dashed #ccc;
         width: 300px;
@@ -21,23 +31,39 @@
         background-color: #f4f4f4;
         padding: 10px;
       }
+      footer {
+        background-color: #f4f4f4;
+        text-align: center;
+      }
     </style>
   </head>
   <body>
-    <h2>
-      Drop the CSV file exported from XTB to generate DivTracker import sheet
-    </h2>
-    <h3>1. Please select a currency of the imported wallet</h3>
-    <select name="currency" id="currency">
-      <option value="PLN">PLN</option>
-      <option value="EUR">EUR</option>
-      <option value="USD">USD</option>
-    </select>
+    <div id="content">
+      <h2>
+        Drop the XLSX file exported from XTB to generate DivTracker import sheet
+      </h2>
+      <h3>1. Please select a currency of the imported wallet</h3>
+      <select name="currency" id="currency">
+        <option value="PLN">PLN</option>
+        <option value="EUR">EUR</option>
+        <option value="USD">USD</option>
+      </select>
 
-    <h3>2. Drop a CSV file exported from XTB</h3>
-    <div id="drop-area">Drop your CSV transaction history file here</div>
+      <h3>2. Drop a XLSX file exported from XTB</h3>
+      <div id="drop-area">Drop your XLSX transaction history file here</div>
 
-    <div id="file-content"></div>
+      <div id="file-content"></div>
+    </div>
+
     <script src="dist/main.js"></script>
+
+    <footer>
+      <p>
+        This tool is provided for informational purposes only. The accuracy and
+        completeness of the processed data are not guaranteed. Use at your own
+        risk.
+        Source code available at <a href="https://github.com/cymruu/xtb-to-divtracker"/>GitHub</a>
+      </p>
+    </footer>
   </body>
 </html>
