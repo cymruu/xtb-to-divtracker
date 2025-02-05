@@ -89,7 +89,7 @@ const parseData = (currency: string) =>
         CostPerShare: parseCostPerShare(chunk["Comment"]),
         Currency: currency,
         Date: parseDate(chunk["Time"]),
-        Commision: "",
+        Commission: "",
         CommissionCurrency: "",
         DRIPConfirmed: "",
       });
