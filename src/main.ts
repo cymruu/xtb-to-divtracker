@@ -42,7 +42,7 @@ const processFile = async (file: File, currency: string) => {
 
 (() => {
   const dropArea = document.getElementById("drop-area")!;
-  const fileContentDiv = document.getElementById("file-content")!;
+  const errorMessageDiv = document.getElementById("error-message")!;
 
   dropArea.addEventListener("dragover", (event) => {
     event.preventDefault();
@@ -68,7 +68,7 @@ const processFile = async (file: File, currency: string) => {
     ) {
       processFile(file, currency);
     } else {
-      fileContentDiv.textContent = "Please select a valid XLSX file.";
+      errorMessageDiv.textContent = "Please select a valid XLSX file.";
     }
   });
 })();
