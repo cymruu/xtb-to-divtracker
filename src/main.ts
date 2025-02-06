@@ -23,21 +23,26 @@ const processFile = async (file: File, currency: string) => {
   const arrayBuffer = await file.arrayBuffer();
   const bytes = new Uint8Array(arrayBuffer);
 
-  excelizePromise.then(async (excelize) => {
-    const xlsxFile = excelize.OpenReader(bytes);
+  excelizePromise
+    .then(async (excelize) => {
+      const xlsxFile = excelize.OpenReader(bytes);
 
-    const result = xlsxFile.GetRows("CASH OPERATION HISTORY");
-    if (result.error) {
-      throw result.error;
-    }
+      const result = xlsxFile.GetRows("CASH OPERATION HISTORY");
+      if (result.error) {
+        throw result.error;
+      }
 
-    const parsedLines = parseCashOperationRows(result.result);
-    const stream = arrayToReadableStream(parsedLines.result);
-    const resultFile = await processRowStream(stream, currency);
+      const parsedLines = parseCashOperationRows(result.result);
+      const stream = arrayToReadableStream(parsedLines.result);
+      const resultFile = await processRowStream(stream, currency);
 
-    const link = downloadFile(resultFile, resultFile.name);
-    link.click();
-  });
+      const link = downloadFile(resultFile, resultFile.name);
+      link.click();
+    })
+    .catch((err) => {
+      console.error(err);
+      alert("failed to load WASM excelize module");
+    });
 };
 
 (() => {
