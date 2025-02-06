@@ -32,7 +32,7 @@ jobs:
         run: |
           cp node_modules/excelize-wasm/excelize.wasm.gz ./dist/
           SHA_SHORT=$(git rev-parse --short HEAD)
-          BUILD_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+          BUILD_TIME=$(date +"%Y-%m-%d %H:%M:%S %Z")
           sed -i'' -e "s/{{VERSION}}/$SHA_SHORT/" index.html
           sed -i'' -e "s/{{BUILD_TIME}}/$BUILD_TIME/" index.html
       - name: Upload build-artifacts
