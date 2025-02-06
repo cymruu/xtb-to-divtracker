@@ -3,5 +3,8 @@ export const parseTicker = (v: string) => {
   if (exchange === "US") {
     return symbol;
   }
+  if (exchange === "UK") {
+    return `${symbol}.GB`;
+  }
   return v;
 };

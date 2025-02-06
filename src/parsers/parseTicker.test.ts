@@ -8,6 +8,7 @@ const testCases = [
   { input: { ticker: "IVG.IT" }, expected: "IVG.IT" },
   { input: { ticker: "JMT.PT" }, expected: "JMT.PT" },
   { input: { ticker: "XTB.PL" }, expected: "XTB.PL" },
+  { input: { ticker: "RBOT.UK" }, expected: "RBOT.GB" },
 ];
 
 describe("parseQuantity", () => {
