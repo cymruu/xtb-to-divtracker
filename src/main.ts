@@ -1,6 +1,7 @@
 import { init } from "excelize-wasm";
 import { parseCashOperationRows } from "./parsers/parseCashOperationRows";
 import { processRowStream } from "./stream";
+import { checkWASMSupport } from "./checkWASMSupport";
 
 const excelizePromise = init("./dist/excelize.wasm.gz");
 
@@ -76,6 +77,12 @@ const processFile = async (file: File, currency: string) => {
       errorMessageDiv.textContent = "Please select a valid XLSX file.";
     }
   });
+
+  const WASMEnabled = checkWASMSupport();
+  if (!WASMEnabled) {
+    errorMessageDiv.innerHTML =
+      '<p class="error-message">Your browser does not support WebAssembly (WASM). Please try using a modern browser such as Firefox or Google Chrome.</>';
+  }
 })();
 
 const downloadFile = (file: File, filename: string): HTMLAnchorElement => {
