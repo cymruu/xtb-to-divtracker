@@ -1,6 +1,7 @@
-export const parseTicker = (v: string, currency: string) => {
-  if (currency === "USD") {
-    return v.split(".")[0];
+export const parseTicker = (v: string) => {
+  const [symbol, exchange] = v.split(".");
+  if (exchange === "US") {
+    return symbol;
   }
   return v;
 };

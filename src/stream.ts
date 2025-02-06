@@ -84,7 +84,7 @@ const parseData = (currency: string) =>
   new TransformStream({
     transform(chunk, controller) {
       controller.enqueue({
-        Ticker: parseTicker(chunk["Symbol"], currency),
+        Ticker: parseTicker(chunk["Symbol"]),
         Quantity: parseQuantity(chunk["Comment"]),
         CostPerShare: parseCostPerShare(chunk["Comment"]),
         Currency: currency,
