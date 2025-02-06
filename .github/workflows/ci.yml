@@ -27,7 +27,14 @@ jobs:
       - run: pnpm install
       - run: pnpm test
       - run: pnpm run build
-      - run: cp node_modules/excelize-wasm/excelize.wasm.gz ./dist/
+      - name: prepare build
+        if: github.ref == 'refs/heads/master'
+        run: |
+          cp node_modules/excelize-wasm/excelize.wasm.gz ./dist/
+          SHA_SHORT=$(git rev-parse --short HEAD)
+          BUILD_TIME=$(date +"%Y-%m-%d %H:%M:%S")
+          sed -i'' -e "s/{{VERSION}}/$SHA_SHORT/" index.html
+          sed -i'' -e "s/{{BUILD_TIME}}/$BUILD_TIME/" index.html
       - name: Upload build-artifacts
         if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v4
@@ -39,4 +46,5 @@ jobs:
 
   trigger-deploy:
     needs: build
+    if: github.ref == 'refs/heads/master'
     uses: cymruu/xtb-to-divtracker/.github/workflows/deploy.yml@master
