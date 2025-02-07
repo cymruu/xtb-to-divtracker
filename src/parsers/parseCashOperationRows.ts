@@ -14,14 +14,41 @@ type ParsedCashOperationLine = [
   TransactionAmountCel,
 ];
 
-type ParseCashOperationRowsResult = {
-  result: ParsedCashOperationLine[];
-  error: string | null;
+type ParseCashOperationRowsResult =
+  | {
+      result: null;
+      error: Error;
+    }
+  | {
+      result: { currency: string; data: ParsedCashOperationLine[] };
+      error: null;
+    };
+
+const findCurrency = (
+  rows: string[][],
+): { error: Error; result: null } | { error: null; result: string } => {
+  for (const [index, row] of rows.entries()) {
+    const [_c1, _c2, _c3, _c4, _c5, c6, ..._rest] = row;
+    if (c6 === "Currency") {
+      const currency = rows[index + 1][5];
+      if (typeof currency === "string")
+        return { error: null, result: currency };
+    }
+  }
+  return { error: new Error("Currency not found"), result: null };
 };
 
 export const parseCashOperationRows = (
   rows: string[][],
 ): ParseCashOperationRowsResult => {
+  console.log("rows", rows);
+  const currencyParseResult = findCurrency(rows);
+  console.log({ currencyParseResult });
+
+  if (currencyParseResult.error) {
+    return { error: currencyParseResult.error, result: null };
+  }
+
   // data starts at row 12
   const data = rows.splice(11).map((row) => {
     const [
@@ -47,6 +74,6 @@ export const parseCashOperationRows = (
 
   return {
     error: null,
-    result: data,
+    result: { currency: currencyParseResult.result, data },
   };
 };

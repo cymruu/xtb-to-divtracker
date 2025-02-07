@@ -11,16 +11,19 @@ describe("parseCashOperationRows", () => {
     );
 
     equal(result.error, null);
-    deepEqual(result.result, [
-      [
-        "transaction_id: 11",
-        "transaction_type: 11",
-        "transaction_time: 11",
-        "transaction_comment: 11",
-        "transaction_symbol: 11",
-        "transaction_amount: 11",
+    deepEqual(result.result, {
+      currency: "USD",
+      data: [
+        [
+          "transaction_id: 11",
+          "transaction_type: 11",
+          "transaction_time: 11",
+          "transaction_comment: 11",
+          "transaction_symbol: 11",
+          "transaction_amount: 11",
+        ],
       ],
-    ]);
+    });
   });
 
   it("should skip the first 11 lines and parse the rest", () => {
@@ -34,10 +37,10 @@ describe("parseCashOperationRows", () => {
     const result = parseCashOperationRows(rawRows);
 
     equal(result.error, null);
-    equal(result.result.length, expectedNumberOfParsedRows);
-    deepEqual(
-      result.result,
-      Array.from({ length: expectedNumberOfParsedRows }).map((_, i) => [
+    equal(result.result!.data.length, expectedNumberOfParsedRows);
+    deepEqual(result.result, {
+      currency: "USD",
+      data: Array.from({ length: expectedNumberOfParsedRows }).map((_, i) => [
         `transaction_id: ${i + 11}`,
         `transaction_type: ${i + 11}`,
         `transaction_time: ${i + 11}`,
@@ -45,6 +48,6 @@ describe("parseCashOperationRows", () => {
         `transaction_symbol: ${i + 11}`,
         `transaction_amount: ${i + 11}`,
       ]),
-    );
+    });
   });
 });

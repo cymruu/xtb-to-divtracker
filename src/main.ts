@@ -34,8 +34,14 @@ const processFile = async (file: File, currency: string) => {
       }
 
       const parsedLines = parseCashOperationRows(result.result);
-      const stream = arrayToReadableStream(parsedLines.result);
-      const resultFile = await processRowStream(stream, currency);
+      if (parsedLines.error) {
+        throw parsedLines.error;
+      }
+      const stream = arrayToReadableStream(parsedLines.result.data);
+      const resultFile = await processRowStream(
+        stream,
+        parsedLines.result.currency,
+      );
 
       const link = downloadFile(resultFile, resultFile.name);
       link.click();
