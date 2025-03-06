@@ -11,10 +11,10 @@
     "./dist"
   ],
   "devDependencies": {
-    "@types/node": "22.5.5",
-    "esbuild": "0.23.1",
-    "tsx": "4.19.0",
-    "typescript": "5.5.4"
+    "@types/node": "22.13.9",
+    "esbuild": "0.25.0",
+    "tsx": "4.19.3",
+    "typescript": "5.8.2"
   },
   "dependencies": {
     "excelize-wasm": "0.0.7"
