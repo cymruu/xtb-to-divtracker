@@ -2,7 +2,7 @@
   "name": "xtb-to-divtracker",
   "version": "0.0.1",
   "main": "dist/main.js",
-  "packageManager": "pnpm@10.6.0",
+  "packageManager": "pnpm@10.6.3",
   "scripts": {
     "build": "esbuild src/main.ts --bundle --loader:.wasm.gz=file --format=esm --external:fs --external:crypto --outfile=./dist/main.js",
     "test": "node --import tsx --test $(find . -name \"*.test.ts\")"
@@ -11,8 +11,8 @@
     "./dist"
   ],
   "devDependencies": {
-    "@types/node": "22.13.9",
-    "esbuild": "0.25.0",
+    "@types/node": "22.13.10",
+    "esbuild": "0.25.1",
     "tsx": "4.19.3",
     "typescript": "5.8.2"
   },
