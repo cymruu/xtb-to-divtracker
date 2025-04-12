@@ -73,7 +73,10 @@ const filterData = () =>
       const lineType = chunk["Type"];
       if (
         lineType === "Stocks/ETF purchase" ||
-        lineType === "Stocks/ETF sale"
+        lineType === "Stocks/ETF sale" ||
+        // 2025-04-12 XTB introduced a bug where `Type` column contained internal type names
+        lineType === "Stock sale" ||
+        lineType === "Stock purchase"
       ) {
         controller.enqueue(chunk);
       }
